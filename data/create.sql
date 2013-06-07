@@ -1,0 +1,78 @@
+USE powerlifting;
+
+CREATE TABLE IF NOT EXISTS Lifter (
+    uid SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    username VARCHAR(20) NOT NULL,
+    first VARCHAR(15) NOT NULL,
+    last VARCHAR(20) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR(60) NOT NULL,
+    weight SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY (uid),
+    UNIQUE (username)
+    ) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS Exercise (
+    eid SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(1000),
+    PRIMARY KEY (eid),
+    UNIQUE (name)
+    ) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS Workout (
+    wid SMALLINT UNSIGNED NOT NULL,
+    eid SMALLINT UNSIGNED NOT NULL,
+    sets TINYINT UNSIGNED,
+    reps TINYINT UNSIGNED,
+    PRIMARY KEY (wid, eid),
+    FOREIGN KEY (eid) REFERENCES Exercise(eid)
+    ) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS WorkoutDate (
+    wdkey SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    wid SMALLINT UNSIGNED NOT NULL,
+    date DATE,
+    PRIMARY KEY (wdkey),
+    FOREIGN KEY (wid) REFERENCES Workout(wid),
+    UNIQUE (date)
+    ) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS LifterWorkoutHistory (
+    uid SMALLINT UNSIGNED NOT NULL,
+    wdkey SMALLINT UNSIGNED NOT NULL,
+    weight SMALLINT UNSIGNED,
+    comments text,
+    PRIMARY KEY(uid, wdkey),
+    FOREIGN KEY (uid) REFERENCES Lifter(uid),
+    FOREIGN KEY (wdkey) REFERENCES WorkoutDate(wdkey)
+    ) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS Lifts (
+    uid SMALLINT UNSIGNED NOT NULL,
+    wdkey SMALLINT UNSIGNED NOT NULL,
+    eid SMALLINT UNSIGNED NOT NULL,
+    `set` TINYINT UNSIGNED,
+    reps TINYINT UNSIGNED,
+    weight float(4,1),
+    PRIMARY KEY (uid, wdkey, eid, `set`),
+    FOREIGN KEY (uid) REFERENCES Lifter(uid),
+    FOREIGN KEY (wdkey) REFERENCES WorkoutDate(wdkey),
+    FOREIGN KEY (eid) REFERENCES Exercise(eid)
+    ) ENGINE=INNODB;
+
+
+CREATE TABLE IF NOT EXISTS Split (
+    skey SMALLINT UNSIGNED NOT NULL,
+    start DATE,
+    end DATE,
+    PRIMARY KEY (skey),
+    UNIQUE (start),
+    UNIQUE (end)
+    ) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS Admins (
+    uid SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY (uid),
+    FOREIGN KEY (uid) REFERENCES Lifter(uid)
+    ) ENGINE=INNODB;
